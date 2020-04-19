@@ -38,6 +38,7 @@ function MemControlBlock(size) {
 function Heap() {
 	this.head = null;
 	this.size = 0;
+	this.lastAllocated = null;
 
 	// Allocate process to memory.
 	// Use best-fit method: from the list of holes, choose the smallest hole
@@ -72,6 +73,7 @@ function Heap() {
 
 		blockFirstFit.setProcess(process);
 		process.allocatedBlock = blockFirstFit;
+		this.lastAllocated = blockFirstFit;
 		return true;
 	};
 
@@ -118,6 +120,106 @@ function Heap() {
 
 		blockBestFit.setProcess(process);
 		process.allocatedBlock = blockBestFit;
+		this.lastAllocated = blockBestFit;
+		return true;
+	};
+
+	this.requestAllocationWorstFit = function(process) {
+		blockWorstFit = this.head;
+
+		// Make sure our initial best block is valid
+		while ((blockWorstFit.size < process.size) || (!blockWorstFit.available)) {
+			blockWorstFit = blockWorstFit.next;
+			if (blockWorstFit == null) {return false}; // Means we couldn't even find an initial valid block
+		};
+		//log("Initial best block: " + blockBestFit.size);
+
+		// See if there's an even better block
+		block = blockWorstFit;
+		while (block != null) {
+			//log("Testing block: " + block.size);
+			if ((block.size >= process.size) && (block.available) && (block.size > blockWorstFit.size)) {
+				blockWorstFit = block;
+				//log("New best block: " + blockBestFit.size);
+			};
+			block = block.next;
+		};
+
+		spaceLeftover = blockWorstFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+
+		// Partition block if needed
+		if (spaceLeftover > 0) {
+			newBlock = new MemControlBlock(spaceLeftover);
+
+			nextBlock = blockWorstFit.next;
+			if (nextBlock != null) {
+				nextBlock.prev = newBlock;
+				newBlock.next = nextBlock;
+			};
+
+			blockWorstFit.next = newBlock;
+			newBlock.prev = blockWorstFit;
+
+			blockWorstFit.size = process.size;
+
+			newBlock.fromPartition = true;
+		};
+
+		blockWorstFit.setProcess(process);
+		process.allocatedBlock = blockWorstFit;
+		this.lastAllocated = blockWorstFit;
+		return true;
+	};
+
+	this.requestAllocationNextFit = function(process) {
+		
+		if (this.lastAllocated == null) {
+			this.lastAllocated = this.head;
+		}
+
+		blockNextFit = this.lastAllocated;
+
+		// Make sure our initial best block is valid
+		while ((blockNextFit.size < process.size) || (!blockNextFit.available)) {
+			blockNextFit = blockNextFit.next;
+			if (blockNextFit == null) {return false}; // Means we couldn't even find an initial valid block
+		};
+		//log("Initial best block: " + blockBestFit.size);
+
+		// See if there's an even better block
+		block = blockNextFit.next;
+		while (block != null) {
+			//log("Testing block: " + block.size);
+			if ((block.size >= process.size) && (block.available) && (block.size < blockNextFit.size)) {
+				blockNextFit = block;
+				//log("New best block: " + blockBestFit.size);
+			};
+			block = block.next;
+		};
+
+		spaceLeftover = blockNextFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+
+		// Partition block if needed
+		if (spaceLeftover > 0) {
+			newBlock = new MemControlBlock(spaceLeftover);
+
+			nextBlock = blockNextFit.next;
+			if (nextBlock != null) {
+				nextBlock.prev = newBlock;
+				newBlock.next = nextBlock;
+			};
+
+			blockNextFit.next = newBlock;
+			newBlock.prev = blockNextFit;
+
+			blockNextFit.size = process.size;
+
+			newBlock.fromPartition = true;
+		};
+
+		blockNextFit.setProcess(process);
+		process.allocatedBlock = blockNextFit;
+		this.lastAllocated = blockNextFit;
 		return true;
 	};
 
@@ -138,21 +240,21 @@ function Heap() {
 		this.size += block.size;
 	}
 
-	this.toString = function() {
-		string = "[|";
-		block = this.head;
+	// this.toString = function() {
+	// 	string = "[|";
+	// 	block = this.head;
 
-		prefix = "";
-		suffix = "</span> |";
-		while (block != null) {
-			if (block.available) {prefix = "<span style='color: #01DF01;'> "} else {prefix = "<span style='color: #FF0000;'> "};
-			string += (prefix + block.size + suffix);
-			block = block.next;
-		};
+	// 	prefix = "";
+	// 	suffix = "</span> |";
+	// 	while (block != null) {
+	// 		if (block.available) {prefix = "<span style='color: #01DF01;'> "} else {prefix = "<span style='color: #FF0000;'> "};
+	// 		string += (prefix + block.size + suffix);
+	// 		block = block.next;
+	// 	};
 
-		string += "]"
-		return string;
-	};
+	// 	string += "]"
+	// 	return string;
+	// };
 
 	this.repaint = function() {
 		block = this.head;
@@ -203,8 +305,8 @@ document.getElementById("processForm").onsubmit = function () {
 
 
 	// Debug log
-	log("Requesting: " + process.size);
-	log(heap.toString() + "<br>");
+	// log("Requesting: " + process.size);
+	// log(heap.toString() + "<br>");
 
 	// Clear form
 	inProcessSize.value = "";
@@ -213,9 +315,9 @@ document.getElementById("processForm").onsubmit = function () {
 	return false;
 };
 
-function log(string) {
-	logBox.innerHTML += (string + "<br />");
-}
+// function log(string) {
+// 	logBox.innerHTML += (string + "<br />");
+// }
 
 function addProcessToTable(process) {
 	row = document.createElement("tr");
@@ -280,6 +382,12 @@ var clock = setInterval(function() {
 			}
 			else if (document.getElementById('algo_bf').checked) {
 				heap.requestAllocationBestFit(process);
+			}
+			else if (document.getElementById('algo_wf').checked) {
+				heap.requestAllocationWorstFit(process);
+			}
+			else if (document.getElementById('algo_nf').checked) {
+				heap.requestAllocationNextFit(process);
 			}
 		} else {
 			process.tick();
