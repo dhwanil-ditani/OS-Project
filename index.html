@@ -1,43 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Jamie Goodson's Website</title>
-	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700' rel='stylesheet' type='text/css'>
+	<title>memory allocation algorithm simulator.</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"> 
 	<link href='style.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
-<div id="mainContainer">
-	<div id="title">
-		<h1>Memory Management</h1><h3>An Online Simulation</h3>
+<div id="title">
+	<h1>memory allocation algorithm simulator.</h1>
+	<div id="navBar">
+		<label for="algo_ff">FIRST FIT. <input type="radio" name="algo" id="algo_ff" value="First_Fit" required checked /></label>
+		<label for="algo_nf">NEXT FIT. <input type="radio" name="algo" id="algo_nf" value="Next_Fit" required /></label>
+		<label for="algo_bf">BEST FIT. <input type="radio" name="algo" id="algo_bf" value="Best_Fit" required /></label>
+		<label for="algo_wf">WORST FIT. <input type="radio" name="algo" id="algo_wf" value="Worst_Fit" required /></label>
 	</div>
+</div>
 
+<!-- <div id="navBar">
+	<label for="algo_ff">FIRST FIT. <input type="radio" name="algo" id="algo_ff" value="First_Fit" required checked /></label>
+	<label for="algo_nf">NEXT FIT. <input type="radio" name="algo" id="algo_nf" value="Next_Fit" required /></label>
+	<label for="algo_bf">BEST FIT. <input type="radio" name="algo" id="algo_bf" value="Best_Fit" required /></label>
+	<label for="algo_wf">WORST FIT. <input type="radio" name="algo" id="algo_wf" value="Worst_Fit" required /></label>
+</div> -->
+
+<div id="mainContainer">	
 	<div id="rightContainer">
 		<div id="memoryContainer">
 			<div id="memory"></div>
 		</div>
 	</div>
-
+	
 	<div id="leftContainer">
-		<input type="radio" name="algo" id="algo_ff" value="First_Fit" /> First Fit. <br>
-		<input type="radio" name="algo" id="algo_bf" value="Best_Fit" /> Best Fit. <br>
-		<input type="radio" name="algo" id="algo_wf" value="Worst_Fit" /> Worst Fit. <br>
-		<input type="radio" name="algo" id="algo_nf" value="Next_Fit" /> Next Fit.
-		<h2>Add Process</h2>
+		<h3>ADD PROCESS</h3>
 		<form id="processForm">
-			<input type="text" name="processSize" placeholder="Process size" autocomplete="off" />
-			<input type="text" name="processTime" placeholder="Process time" autocomplete="off" />
-			<button type="submit" style="display:none;" /></button>
+			<input type="text" name="processSize" placeholder="process size." autocomplete="off" />
+			<input type="text" name="processTime" placeholder="process time." autocomplete="off" />
+			<button type="submit" style="display:none;"></button>
 		</form>
 		<br><br>
-		<h2>Process Queue</h2>
+		<h3>PROCESS QUEUE</h3>
 		<table id="processTable">
-			<tr><th>Process ID</th><th>Size (K)</th><th>Time Units Remaining</th></tr>
+			<tr><th>PROCESS ID</th><th>SIZE (K)</th><th>TIME REMAINING</th></tr>
 		</table>
 		<br>
 		<br>
-		<!-- <div id="logBoxContainer">
-			<div id="logBox">DEBUG LOG<br></div>
-		</div> -->
 	</div>
 </div>
 

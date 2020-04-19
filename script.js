@@ -21,7 +21,7 @@ function MemControlBlock(size) {
 	this.available = true;
 	this.next = null;
 	this.prev = null;
-	this.fromPartition = false; // Used to determine whether height of a MemControlBlock needs to be added
+	this.fromPartition = false;
 
 	this.setProcess = function(process) {
 		if (process == null) {
@@ -34,26 +34,21 @@ function MemControlBlock(size) {
 	};
 };
 
-// Simulates memory
 function Heap() {
 	this.head = null;
 	this.size = 0;
 	this.lastAllocated = null;
 
-	// Allocate process to memory.
-	// Use best-fit method: from the list of holes, choose the smallest hole
 	this.requestAllocationFirstFit = function(process) {
 		blockFirstFit = this.head;
 
-		// Make sure our initial best block is valid
 		while ((blockFirstFit.size < process.size) || (!blockFirstFit.available)) {
 			blockFirstFit = blockFirstFit.next;
-			if (blockFirstFit == null) {return false}; // Means we couldn't even find an initial valid block
+			if (blockFirstFit == null) {return false};
 		};
 
-		spaceLeftover = blockFirstFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+		spaceLeftover = blockFirstFit.size - (process.size + memControlBlockSize); 
 
-		// Partition block if needed
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
 
@@ -80,27 +75,21 @@ function Heap() {
 	this.requestAllocationBestFit = function(process) {
 		blockBestFit = this.head;
 
-		// Make sure our initial best block is valid
 		while ((blockBestFit.size < process.size) || (!blockBestFit.available)) {
 			blockBestFit = blockBestFit.next;
-			if (blockBestFit == null) {return false}; // Means we couldn't even find an initial valid block
+			if (blockBestFit == null) {return false};
 		};
-		//log("Initial best block: " + blockBestFit.size);
 
-		// See if there's an even better block
 		block = blockBestFit.next;
 		while (block != null) {
-			//log("Testing block: " + block.size);
 			if ((block.size >= process.size) && (block.available) && (block.size < blockBestFit.size)) {
 				blockBestFit = block;
-				//log("New best block: " + blockBestFit.size);
 			};
 			block = block.next;
 		};
 
-		spaceLeftover = blockBestFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+		spaceLeftover = blockBestFit.size - (process.size + memControlBlockSize);
 
-		// Partition block if needed
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
 
@@ -127,27 +116,21 @@ function Heap() {
 	this.requestAllocationWorstFit = function(process) {
 		blockWorstFit = this.head;
 
-		// Make sure our initial best block is valid
 		while ((blockWorstFit.size < process.size) || (!blockWorstFit.available)) {
 			blockWorstFit = blockWorstFit.next;
-			if (blockWorstFit == null) {return false}; // Means we couldn't even find an initial valid block
+			if (blockWorstFit == null) {return false};
 		};
-		//log("Initial best block: " + blockBestFit.size);
 
-		// See if there's an even better block
 		block = blockWorstFit;
 		while (block != null) {
-			//log("Testing block: " + block.size);
 			if ((block.size >= process.size) && (block.available) && (block.size > blockWorstFit.size)) {
 				blockWorstFit = block;
-				//log("New best block: " + blockBestFit.size);
 			};
 			block = block.next;
 		};
 
-		spaceLeftover = blockWorstFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+		spaceLeftover = blockWorstFit.size - (process.size + memControlBlockSize);
 
-		// Partition block if needed
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
 
@@ -179,27 +162,21 @@ function Heap() {
 
 		blockNextFit = this.lastAllocated;
 
-		// Make sure our initial best block is valid
 		while ((blockNextFit.size < process.size) || (!blockNextFit.available)) {
 			blockNextFit = blockNextFit.next;
-			if (blockNextFit == null) {return false}; // Means we couldn't even find an initial valid block
+			if (blockNextFit == null) {return false}; 
 		};
-		//log("Initial best block: " + blockBestFit.size);
 
-		// See if there's an even better block
 		block = blockNextFit.next;
 		while (block != null) {
-			//log("Testing block: " + block.size);
 			if ((block.size >= process.size) && (block.available) && (block.size < blockNextFit.size)) {
 				blockNextFit = block;
-				//log("New best block: " + blockBestFit.size);
 			};
 			block = block.next;
 		};
 
-		spaceLeftover = blockNextFit.size - (process.size + memControlBlockSize); // Space leftover if block was divided
+		spaceLeftover = blockNextFit.size - (process.size + memControlBlockSize);
 
-		// Partition block if needed
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
 
@@ -240,22 +217,6 @@ function Heap() {
 		this.size += block.size;
 	}
 
-	// this.toString = function() {
-	// 	string = "[|";
-	// 	block = this.head;
-
-	// 	prefix = "";
-	// 	suffix = "</span> |";
-	// 	while (block != null) {
-	// 		if (block.available) {prefix = "<span style='color: #01DF01;'> "} else {prefix = "<span style='color: #FF0000;'> "};
-	// 		string += (prefix + block.size + suffix);
-	// 		block = block.next;
-	// 	};
-
-	// 	string += "]"
-	// 	return string;
-	// };
-
 	this.repaint = function() {
 		block = this.head;
 		memoryDiv.innerHTML = "";
@@ -266,15 +227,12 @@ function Heap() {
 				height += (memControlBlockSize/heap.size)*100;
 			};
 
-			// Create div block element
 			divBlock = document.createElement("div");
 			divBlock.style.height = (height + "%");
 			divBlock.setAttribute("id", "block");
 			if (block.available) {divBlock.className = "available"} else {divBlock.className = "unavailable"};
 			memoryDiv.appendChild(divBlock);
 
-			// Add size label
-			// TODO: Show process details on mouse over
 			blockLabel = document.createElement("div");
 			blockLabel.setAttribute("id", "blockLabel");
 			blockLabel.style.height = (height + "%");
@@ -289,35 +247,22 @@ function Heap() {
 	};
 };
 
-// Handle front-end process submission
 document.getElementById("processForm").onsubmit = function () {
-	elements = this.elements; // Form elements
+	elements = this.elements;
 
 	inProcessSize = elements.namedItem("processSize");
 	inProcessTime = elements.namedItem("processTime");
 
 	process = new Process(parseInt(inProcessSize.value), parseInt(inProcessTime.value));
 
-/*	heap.requestAllocation(process);
-	heap.repaint();*/
 	processes.push(process);
 	addProcessToTable(process);
 
-
-	// Debug log
-	// log("Requesting: " + process.size);
-	// log(heap.toString() + "<br>");
-
-	// Clear form
 	inProcessSize.value = "";
 	inProcessTime.value = "";
 
 	return false;
 };
-
-// function log(string) {
-// 	logBox.innerHTML += (string + "<br />");
-// }
 
 function addProcessToTable(process) {
 	row = document.createElement("tr");
@@ -344,7 +289,6 @@ function removeProcessFromTable(process) {
 	processTable.removeChild(document.getElementById("process" + process.id));
 };
 
-// TODO: Update 'time left' for each row in table 
 function refreshTable() {
 	for (i=0; i<processes.length; i++) {
 		process = processes[i];
@@ -352,7 +296,6 @@ function refreshTable() {
 	};
 };
 
-var logBox = document.getElementById("logBox");
 var memoryDiv = document.getElementById("memory");
 var processTable = document.getElementById("processTable");
 
@@ -367,11 +310,8 @@ for (i=blockSizes.length-1; i>=0; i--) {
 	heap.add(new MemControlBlock(blockSizes[i]));
 };
 
-// Draw initial heap
 heap.repaint();
 
-// Start clock
-// Loop through all processes and allocate those that require allocation. Deallocate those that have <0 time remaining
 var clock = setInterval(function() {
 	for (i=0; i<processes.length; i++) {
 		process = processes[i];
@@ -392,16 +332,13 @@ var clock = setInterval(function() {
 		} else {
 			process.tick();
 			if (process.timeLeft < 1) {
-				// Deallocate process from heap
 				heap.deallocateProcess(process);
 
-				// Remove process from processes array
 				index = processes.indexOf(process);
 				if (index > -1) {
 					processes.splice(index, 1);
 				};
 
-				// Remove process from table
 				removeProcessFromTable(process);
 			};
 		};
