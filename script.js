@@ -34,7 +34,7 @@ function MemControlBlock(size) {
 	};
 };
 
-function Heap() {
+function LinkedList() {
 	this.head = null;
 	this.size = 0;
 	this.lastAllocated = null;
@@ -222,9 +222,9 @@ function Heap() {
 		memoryDiv.innerHTML = "";
 
 		while (block != null) {
-			height = ((block.size/heap.size)*100);
+			height = ((block.size/linkedList.size)*100);
 			if (block.fromPartition) {
-				height += (memControlBlockSize/heap.size)*100;
+				height += (memControlBlockSize/linkedList.size)*100;
 			};
 
 			divBlock = document.createElement("div");
@@ -303,14 +303,14 @@ var memControlBlockSize = 0;
 var processID = 0;
 var processes = [];
 
-heap = new Heap();
+linkedList = new LinkedList();
 blockSizes = [100, 500, 200, 300, 600];
 
 for (i=blockSizes.length-1; i>=0; i--) {
-	heap.add(new MemControlBlock(blockSizes[i]));
+	linkedList.add(new MemControlBlock(blockSizes[i]));
 };
 
-heap.repaint();
+linkedList.repaint();
 
 var clock = setInterval(function() {
 	for (i=0; i<processes.length; i++) {
@@ -318,21 +318,21 @@ var clock = setInterval(function() {
 
 		if (!process.isAllocated()) {
 			if (document.getElementById('algo_ff').checked) {
-				heap.requestAllocationFirstFit(process);
+				linkedList.requestAllocationFirstFit(process);
 			}
 			else if (document.getElementById('algo_bf').checked) {
-				heap.requestAllocationBestFit(process);
+				linkedList.requestAllocationBestFit(process);
 			}
 			else if (document.getElementById('algo_wf').checked) {
-				heap.requestAllocationWorstFit(process);
+				linkedList.requestAllocationWorstFit(process);
 			}
 			else if (document.getElementById('algo_nf').checked) {
-				heap.requestAllocationNextFit(process);
+				linkedList.requestAllocationNextFit(process);
 			}
 		} else {
 			process.tick();
 			if (process.timeLeft < 1) {
-				heap.deallocateProcess(process);
+				linkedList.deallocateProcess(process);
 
 				index = processes.indexOf(process);
 				if (index > -1) {
@@ -345,5 +345,5 @@ var clock = setInterval(function() {
 	};
 
 	refreshTable();
-	heap.repaint();
+	linkedList.repaint();
 }, 1000);
