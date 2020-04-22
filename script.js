@@ -164,15 +164,11 @@ function LinkedList() {
 
 		while ((blockNextFit.size < process.size) || (!blockNextFit.available)) {
 			blockNextFit = blockNextFit.next;
-			if (blockNextFit == null) {return false}; 
-		};
-
-		block = blockNextFit.next;
-		while (block != null) {
-			if ((block.size >= process.size) && (block.available) && (block.size < blockNextFit.size)) {
-				blockNextFit = block;
-			};
-			block = block.next;
+			if (blockNextFit == null) {
+				blockNextFit = this.head;
+			} else if (blockNextFit == this.lastAllocated) {
+				return false;
+			}; 
 		};
 
 		spaceLeftover = blockNextFit.size - (process.size + memControlBlockSize);
