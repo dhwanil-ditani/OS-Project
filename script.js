@@ -21,7 +21,6 @@ function MemControlBlock(size) {
 	this.available = true;
 	this.next = null;
 	this.prev = null;
-	this.fromPartition = false;
 
 	this.setProcess = function(process) {
 		if (process == null) {
@@ -47,7 +46,7 @@ function LinkedList() {
 			if (blockFirstFit == null) {return false};
 		};
 
-		spaceLeftover = blockFirstFit.size - (process.size + memControlBlockSize); 
+		spaceLeftover = blockFirstFit.size - process.size; 
 
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
@@ -62,8 +61,6 @@ function LinkedList() {
 			newBlock.prev = blockFirstFit;
 
 			blockFirstFit.size = process.size;
-
-			newBlock.fromPartition = true;
 		};
 
 		blockFirstFit.setProcess(process);
@@ -88,7 +85,7 @@ function LinkedList() {
 			block = block.next;
 		};
 
-		spaceLeftover = blockBestFit.size - (process.size + memControlBlockSize);
+		spaceLeftover = blockBestFit.size - process.size;
 
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
@@ -103,8 +100,6 @@ function LinkedList() {
 			newBlock.prev = blockBestFit;
 
 			blockBestFit.size = process.size;
-
-			newBlock.fromPartition = true;
 		};
 
 		blockBestFit.setProcess(process);
@@ -129,7 +124,7 @@ function LinkedList() {
 			block = block.next;
 		};
 
-		spaceLeftover = blockWorstFit.size - (process.size + memControlBlockSize);
+		spaceLeftover = blockWorstFit.size - process.size;
 
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
@@ -144,8 +139,6 @@ function LinkedList() {
 			newBlock.prev = blockWorstFit;
 
 			blockWorstFit.size = process.size;
-
-			newBlock.fromPartition = true;
 		};
 
 		blockWorstFit.setProcess(process);
@@ -171,7 +164,7 @@ function LinkedList() {
 			}; 
 		};
 
-		spaceLeftover = blockNextFit.size - (process.size + memControlBlockSize);
+		spaceLeftover = blockNextFit.size - process.size;
 
 		if (spaceLeftover > 0) {
 			newBlock = new MemControlBlock(spaceLeftover);
@@ -186,8 +179,6 @@ function LinkedList() {
 			newBlock.prev = blockNextFit;
 
 			blockNextFit.size = process.size;
-
-			newBlock.fromPartition = true;
 		};
 
 		blockNextFit.setProcess(process);
@@ -219,9 +210,6 @@ function LinkedList() {
 
 		while (block != null) {
 			height = ((block.size/linkedList.size)*100);
-			if (block.fromPartition) {
-				height += (memControlBlockSize/linkedList.size)*100;
-			};
 
 			divBlock = document.createElement("div");
 			divBlock.style.height = (height + "%");
@@ -295,7 +283,6 @@ function refreshTable() {
 var memoryDiv = document.getElementById("memory");
 var processTable = document.getElementById("processTable");
 
-var memControlBlockSize = 0;
 var processID = 0;
 var processes = [];
 
