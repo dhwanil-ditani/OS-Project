@@ -15,7 +15,7 @@ function Process(size, time) {
 	};
 };
 
-function MemControlBlock(size) {
+function memoryBlock(size) {
 	this.size = size;
 	this.process = null;
 	this.available = true;
@@ -49,7 +49,7 @@ function LinkedList() {
 		spaceLeftover = blockFirstFit.size - process.size; 
 
 		if (spaceLeftover > 0) {
-			newBlock = new MemControlBlock(spaceLeftover);
+			newBlock = new memoryBlock(spaceLeftover);
 
 			nextBlock = blockFirstFit.next;
 			if (nextBlock != null) {
@@ -88,7 +88,7 @@ function LinkedList() {
 		spaceLeftover = blockBestFit.size - process.size;
 
 		if (spaceLeftover > 0) {
-			newBlock = new MemControlBlock(spaceLeftover);
+			newBlock = new memoryBlock(spaceLeftover);
 
 			nextBlock = blockBestFit.next;
 			if (nextBlock != null) {
@@ -127,7 +127,7 @@ function LinkedList() {
 		spaceLeftover = blockWorstFit.size - process.size;
 
 		if (spaceLeftover > 0) {
-			newBlock = new MemControlBlock(spaceLeftover);
+			newBlock = new memoryBlock(spaceLeftover);
 
 			nextBlock = blockWorstFit.next;
 			if (nextBlock != null) {
@@ -167,7 +167,7 @@ function LinkedList() {
 		spaceLeftover = blockNextFit.size - process.size;
 
 		if (spaceLeftover > 0) {
-			newBlock = new MemControlBlock(spaceLeftover);
+			newBlock = new memoryBlock(spaceLeftover);
 
 			nextBlock = blockNextFit.next;
 			if (nextBlock != null) {
@@ -276,7 +276,13 @@ function removeProcessFromTable(process) {
 function refreshTable() {
 	for (i=0; i<processes.length; i++) {
 		process = processes[i];
-		document.getElementById("process" + process.id + "timeLeft").innerHTML = process.timeLeft;
+		if (process.allocatedBlock == null) {
+			document.getElementById("process" + process.id + "timeLeft").innerHTML = "Waiting...";
+		} else if (isNaN(process.timeLeft)) {
+			document.getElementById("process" + process.id + "timeLeft").innerHTML = "∞";
+		} else {
+			document.getElementById("process" + process.id + "timeLeft").innerHTML = process.timeLeft;
+		}
 	};
 };
 
@@ -290,7 +296,7 @@ linkedList = new LinkedList();
 blockSizes = [100, 500, 200, 300, 600];
 
 for (i=blockSizes.length-1; i>=0; i--) {
-	linkedList.add(new MemControlBlock(blockSizes[i]));
+	linkedList.add(new memoryBlock(blockSizes[i]));
 };
 
 linkedList.repaint();
